@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H-1B Eligibility Checker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 250px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        /* Custom file input */
+        .file-input-label {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #4f46e5;
+            color: white;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .file-input-label:hover {
+            background-color: #4338ca;
+        }
+        .file-input {
+            display: none;
+        }
+        #fileName {
+            margin-top: 10px;
+            font-style: italic;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl mx-4 my-8">
+        
+        <!-- Step 1: Welcome -->
+        <div id="step1" class="step active">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">Am I Eligible for H-1B Status?</h1>
+            <p class="text-gray-600 mb-6 text-center">
+                The H-1B is a temporary (nonimmigrant) visa category for workers in specialty occupations. This tool will help you evaluate whether your job offer, educational background, and other factors align with the general requirements for H-1B eligibility.
+            </p>
+            <div class="text-center">
+                <button onclick="nextStep(2)" class="bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700 transition duration-300">
+                    Check My Eligibility &rarr;
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: Current Immigration Status -->
+        <div id="step2" class="step">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-5">Step 1: Current Immigration Status</h2>
+            <label class="font-medium text-gray-700">What is your current immigration status? 
+                <span class="tooltip text-gray-400 cursor-pointer">(?)
+                    <span class="tooltiptext">Please indicate your status, whether you are presently inside or outside the United States.</span>
+                </span>
+            </label>
+            <div class="mt-4 space-y-3">
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="status" value="H-1B" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">H-1B</span>
+                </label>
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="status" value="F-1" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">F-1 Student</span>
+                </label>
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="status" value="OPT" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">F-1 on OPT/STEM OPT</span>
+                </label>
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="status" value="B-1/B-2" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">B-1/B-2 Visitor</span>
+                </label>
+                 <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="status" value="Other" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">None of the Above / Outside the U.S.</span>
+                </label>
+            </div>
+            <div class="mt-8 text-right">
+                <button onclick="nextStep(3)" class="bg-indigo-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-indigo-700 transition">Next</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Maintenance of Status -->
+        <div id="step3" class="step">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-5">Step 2: Maintenance of Status</h2>
+            <label class="font-medium text-gray-700">If you are in the United States, have you continuously maintained lawful immigration status?</label>
+            <div class="mt-4 space-y-3">
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="maintainedStatus" value="yes" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">Yes</span>
+                </label>
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="maintainedStatus" value="no" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">No</span>
+                </label>
+                 <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="maintainedStatus" value="na" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">Not Applicable (I am outside the U.S.)</span>
+                </label>
+            </div>
+             <div class="mt-6">
+                <label class="font-medium text-gray-700">Upload relevant documents (optional):
+                     <span class="tooltip text-gray-400 cursor-pointer">(?)
+                        <span class="tooltiptext">Only include official government-issued documents like visa stamps, I-94, I-797 approval notices, etc.</span>
+                    </span>
+                </label>
+                <div class="mt-2 flex items-center justify-center w-full p-6 border-2 border-dashed rounded-lg">
+                    <div class="text-center">
+                        <label for="file-upload-status" class="file-input-label">Choose File</label>
+                        <input id="file-upload-status" name="file-upload-status" type="file" class="file-input">
+                        <p id="fileNameStatus" class="text-sm text-gray-500 mt-2">No file selected</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 flex justify-between">
+                <button onclick="prevStep(2)" class="bg-gray-300 text-gray-800 font-semibold py-2 px-5 rounded-lg hover:bg-gray-400 transition">Back</button>
+                <button onclick="handleStatusCheck()" class="bg-indigo-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-indigo-700 transition">Next</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Job Offer -->
+        <div id="step4" class="step">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-5">Step 3: Job Offer & Sponsorship</h2>
+            <label class="font-medium text-gray-700">Do you have a job offer from a U.S. employer willing to sponsor your H-1B petition?</label>
+            <div class="mt-4 space-y-3">
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="jobOffer" value="yes" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">Yes</span>
+                </label>
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="jobOffer" value="no" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">No</span>
+                </label>
+            </div>
+            <div class="mt-6">
+                <label class="font-medium text-gray-700">Upload job offer letter (optional):
+                    <span class="tooltip text-gray-400 cursor-pointer">(?)
+                        <span class="tooltiptext">Please upload a letter from your prospective employer offering you the job that you believe qualifies for H-1B.</span>
+                    </span>
+                </label>
+                 <div class="mt-2 flex items-center justify-center w-full p-6 border-2 border-dashed rounded-lg">
+                    <div class="text-center">
+                        <label for="file-upload-offer" class="file-input-label">Choose File</label>
+                        <input id="file-upload-offer" name="file-upload-offer" type="file" class="file-input">
+                        <p id="fileNameOffer" class="text-sm text-gray-500 mt-2">No file selected</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 flex justify-between">
+                <button onclick="prevStep(3)" class="bg-gray-300 text-gray-800 font-semibold py-2 px-5 rounded-lg hover:bg-gray-400 transition">Back</button>
+                <button onclick="handleJobOfferCheck()" class="bg-indigo-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-indigo-700 transition">Next</button>
+            </div>
+        </div>
+        
+        <!-- Step 5: Specialty Occupation -->
+        <div id="step5" class="step">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-5">Step 4: Specialty Occupation</h2>
+            <label class="font-medium text-gray-700">Is the job considered a "specialty occupation" that typically requires a bachelor's or higher degree in a specific field?</label>
+            <div class="mt-4 space-y-3">
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="specialty" value="yes" onclick="document.getElementById('jobTitleInput').style.display='block'" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">Yes</span>
+                </label>
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="specialty" value="no" onclick="document.getElementById('jobTitleInput').style.display='none'" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">No</span>
+                </label>
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="specialty" value="unsure" onclick="document.getElementById('specialtyInfo').style.display='block'" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">I'm Unsure</span>
+                </label>
+            </div>
+            <div id="jobTitleInput" class="mt-4" style="display:none;">
+                <label for="jobTitle" class="font-medium text-gray-700">Enter your job title:</label>
+                <input type="text" id="jobTitle" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div id="specialtyInfo" class="mt-4 p-4 bg-indigo-50 border border-indigo-200 rounded-lg" style="display:none;">
+                <h3 class="font-semibold text-indigo-800">What is a Specialty Occupation?</h3>
+                <p class="text-sm text-indigo-700 mt-2">According to USCIS, a specialty occupation requires theoretical and practical application of a body of highly specialized knowledge and the attainment of a bachelor's or higher degree in the specific specialty (or its equivalent). Examples include engineers, IT professionals, scientists, accountants, and architects.</p>
+                <p class="text-sm text-indigo-700 mt-2">For more details, visit the <a href="https://www.uscis.gov/working-in-the-united-states/h-1b-specialty-occupations" target="_blank" class="underline font-medium">USCIS website</a>.</p>
+            </div>
+            <div class="mt-8 flex justify-between">
+                <button onclick="prevStep(4)" class="bg-gray-300 text-gray-800 font-semibold py-2 px-5 rounded-lg hover:bg-gray-400 transition">Back</button>
+                <button onclick="handleSpecialtyCheck()" class="bg-indigo-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-indigo-700 transition">Next</button>
+            </div>
+        </div>
+
+        <!-- Step 6: Educational Qualifications -->
+        <div id="step6" class="step">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-5">Step 5: Educational Qualifications</h2>
+            <label class="font-medium text-gray-700">Do you have a U.S. bachelor's degree (or higher) in a field directly related to the job?
+                 <span class="tooltip text-gray-400 cursor-pointer">(?)
+                    <span class="tooltiptext">Equivalent foreign degrees or substitution via the "three-for-one" rule (3 years of work experience = 1 year of college) may be accepted.</span>
+                </span>
+            </label>
+            <div class="mt-4 space-y-3">
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="education" value="us_degree" onclick="document.getElementById('educationUpload').style.display='none'" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">Yes, I have a U.S. degree.</span>
+                </label>
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="education" value="foreign_degree" onclick="document.getElementById('educationUpload').style.display='block'" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">No, but I have a foreign equivalent degree.</span>
+                </label>
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="education" value="experience" onclick="document.getElementById('educationUpload').style.display='block'" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">No degree, but I have equivalent education + work experience.</span>
+                </label>
+            </div>
+            <div id="educationUpload" class="mt-6" style="display:none;">
+                <label class="font-medium text-gray-700">Upload diploma, transcripts, or experience letters for equivalency evaluation:</label>
+                 <div class="mt-2 flex items-center justify-center w-full p-6 border-2 border-dashed rounded-lg">
+                    <div class="text-center">
+                        <label for="file-upload-edu" class="file-input-label">Choose File</label>
+                        <input id="file-upload-edu" name="file-upload-edu" type="file" class="file-input">
+                        <p id="fileNameEdu" class="text-sm text-gray-500 mt-2">No file selected</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 flex justify-between">
+                <button onclick="prevStep(5)" class="bg-gray-300 text-gray-800 font-semibold py-2 px-5 rounded-lg hover:bg-gray-400 transition">Back</button>
+                <button onclick="nextStep(7)" class="bg-indigo-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-indigo-700 transition">Next</button>
+            </div>
+        </div>
+
+        <!-- Step 7: Professional Licenses -->
+        <div id="step7" class="step">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-5">Step 6: Professional Licenses</h2>
+            <label class="font-medium text-gray-700">Does your occupation require a state license or professional certification to practice? (e.g., doctor, lawyer, CPA)</label>
+            <div class="mt-4 space-y-3">
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="license" value="yes" onclick="document.getElementById('licenseUpload').style.display='block'" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">Yes</span>
+                </label>
+                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                    <input type="radio" name="license" value="no" onclick="document.getElementById('licenseUpload').style.display='none'" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                    <span class="ml-3 text-gray-700">No</span>
+                </label>
+            </div>
+            <div id="licenseUpload" class="mt-6" style="display:none;">
+                <label class="font-medium text-gray-700">Upload image of license or professional certification:</label>
+                 <div class="mt-2 flex items-center justify-center w-full p-6 border-2 border-dashed rounded-lg">
+                    <div class="text-center">
+                        <label for="file-upload-license" class="file-input-label">Choose File</label>
+                        <input id="file-upload-license" name="file-upload-license" type="file" class="file-input">
+                        <p id="fileNameLicense" class="text-sm text-gray-500 mt-2">No file selected</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 flex justify-between">
+                <button onclick="prevStep(6)" class="bg-gray-300 text-gray-800 font-semibold py-2 px-5 rounded-lg hover:bg-gray-400 transition">Back</button>
+                <button onclick="nextStep(8)" class="bg-indigo-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-indigo-700 transition">Next</button>
+            </div>
+        </div>
+
+        <!-- Step 8: Wage -->
+        <div id="step8" class="step">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-5">Step 7: Wage & Location</h2>
+             <label for="wage" class="font-medium text-gray-700">What is the proposed annual wage your employer will pay you?
+                 <span class="tooltip text-gray-400 cursor-pointer">(?)
+                    <span class="tooltiptext">Employers must file a Labor Condition Application (LCA) and attest to paying the required prevailing wage for the occupation in the area of employment.</span>
+                </span>
+             </label>
+            <div class="mt-2 relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">$</span>
+                <input type="number" id="wage" placeholder="e.g., 95000" class="pl-7 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+             <div class="mt-4">
+                <label for="location" class="font-medium text-gray-700">What is the primary worksite location (city, state)?</label>
+                <input type="text" id="location" placeholder="e.g., Austin, TX" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="mt-8 flex justify-between">
+                <button onclick="prevStep(7)" class="bg-gray-300 text-gray-800 font-semibold py-2 px-5 rounded-lg hover:bg-gray-400 transition">Back</button>
+                <button onclick="handleWageCheck()" class="bg-indigo-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-indigo-700 transition">View Summary</button>
+            </div>
+        </div>
+
+        <!-- Step 9: Summary -->
+        <div id="step9" class="step">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Eligibility Summary</h2>
+            <div id="summaryContent" class="space-y-4 p-6 bg-gray-50 rounded-lg border">
+                <!-- Summary content will be injected here by JavaScript -->
+            </div>
+            <div id="outcome" class="mt-6 text-center p-5 rounded-lg">
+                <!-- Outcome message will be injected here -->
+            </div>
+            <div id="nextSteps" class="mt-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+                 <!-- Next steps will be injected here -->
+            </div>
+            <div class="mt-8 text-center">
+                <button onclick="restart()" class="bg-gray-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-gray-600 transition">Start Over</button>
+            </div>
+        </div>
+        
+        <!-- Ineligible Screens -->
+        <div id="ineligibleStatus" class="step text-center">
+             <h2 class="text-2xl font-bold text-red-600 mb-4">H-1B May Not Be Available</h2>
+             <p class="text-gray-600 mb-6">Failure to maintain lawful status can render you ineligible for a change of status within the U.S. You may need to depart the U.S. and seek a visa at a consulate, but this issue should be discussed with an experienced immigration attorney.</p>
+             <button onclick="restart()" class="bg-gray-500 text-white font-semibold py-2 px-5 rounded-lg hover:bg-gray-600 transition">Start Over</button>
+        </div>
+        <div id="ineligibleOffer" class="step text-center">
+             <h2 class="text-2xl font-bold text-red-600 mb-4">H-1B Requires Employer Sponsorship</h2>
+             <p class="text-gray-600 mb-6">The H-1B visa is employer-sponsored. You must have a job offer from a U.S. employer who is willing to file the petition on your behalf. You cannot self-petition for an H-1B.</p>
+             <button onclick="restart()" class="bg-gray-500 text-white font-semibold py-2 px-5 rounded-lg hover:bg-gray-600 transition">Start Over</button>
+        </div>
+        <div id="ineligibleSpecialty" class="step text-center">
+             <h2 class="text-2xl font-bold text-red-600 mb-4">Position May Not Qualify</h2>
+             <p class="text-gray-600 mb-6">The H-1B visa is strictly for "specialty occupations" that require a bachelor's degree or higher in a specific field. If the position does not meet this standard, it is not eligible for H-1B classification.</p>
+             <button onclick="restart()" class="bg-gray-500 text-white font-semibold py-2 px-5 rounded-lg hover:bg-gray-600 transition">Start Over</button>
+        </div>
+
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 9;
+        const userAnswers = {};
+
+        function showStep(stepNumber) {
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById(`step${stepNumber}`).classList.add('active');
+        }
+
+        function nextStep(stepNumber) {
+            // Save answer before moving
+            saveAnswer(currentStep);
+            if (currentStep < totalSteps) {
+                currentStep = stepNumber;
+                showStep(currentStep);
+            }
+        }
+
+        function prevStep(stepNumber) {
+            if (currentStep > 1) {
+                currentStep = stepNumber;
+                showStep(currentStep);
+            }
+        }
+        
+        function handleStatusCheck() {
+            const maintainedStatus = document.querySelector('input[name="maintainedStatus"]:checked');
+            if (maintainedStatus && maintainedStatus.value === 'no') {
+                document.getElementById('step3').classList.remove('active');
+                document.getElementById('ineligibleStatus').classList.add('active');
+            } else {
+                nextStep(4);
+            }
+        }
+        
+        function handleJobOfferCheck() {
+            const jobOffer = document.querySelector('input[name="jobOffer"]:checked');
+            if (jobOffer && jobOffer.value === 'no') {
+                document.getElementById('step4').classList.remove('active');
+                document.getElementById('ineligibleOffer').classList.add('active');
+            } else {
+                nextStep(5);
+            }
+        }
+        
+        function handleSpecialtyCheck() {
+            const specialty = document.querySelector('input[name="specialty"]:checked');
+            if (specialty && specialty.value === 'no') {
+                document.getElementById('step5').classList.remove('active');
+                document.getElementById('ineligibleSpecialty').classList.add('active');
+            } else {
+                nextStep(6);
+            }
+        }
+        
+        function handleWageCheck() {
+            // This is a mock check. A real application would use an API to get prevailing wage data.
+            // For this demo, we'll assume a positive outcome to show the summary.
+            // In a real scenario, you'd compare the entered wage to the O*NET data for the location.
+            const wage = document.getElementById('wage').value;
+            userAnswers.wageCompliant = true; // Mock result
+            if (parseInt(wage) < 60000) { // Simple arbitrary check
+                 userAnswers.wageCompliant = false;
+            }
+            generateSummary();
+            nextStep(9);
+        }
+
+        function saveAnswer(step) {
+            switch(step) {
+                case 2:
+                    userAnswers.status = document.querySelector('input[name="status"]:checked')?.value || 'Not answered';
+                    break;
+                case 3:
+                    userAnswers.maintainedStatus = document.querySelector('input[name="maintainedStatus"]:checked')?.value || 'Not answered';
+                    break;
+                case 4:
+                    userAnswers.jobOffer = document.querySelector('input[name="jobOffer"]:checked')?.value || 'Not answered';
+                    break;
+                case 5:
+                    userAnswers.specialty = document.querySelector('input[name="specialty"]:checked')?.value || 'Not answered';
+                    userAnswers.jobTitle = document.getElementById('jobTitle').value;
+                    break;
+                case 6:
+                    userAnswers.education = document.querySelector('input[name="education"]:checked')?.value || 'Not answered';
+                    break;
+                case 7:
+                    userAnswers.license = document.querySelector('input[name="license"]:checked')?.value || 'Not answered';
+                    break;
+                case 8:
+                    userAnswers.wage = document.getElementById('wage').value;
+                    userAnswers.location = document.getElementById('location').value;
+                    break;
+            }
+        }
+        
+        function generateSummary() {
+            // Save the final step's answers
+            saveAnswer(8);
+
+            const summaryContent = document.getElementById('summaryContent');
+            summaryContent.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="font-medium text-gray-600">Job offer from U.S. employer:</span>
+                    <span class="font-bold ${userAnswers.jobOffer === 'yes' ? 'text-green-600' : 'text-red-600'}">${userAnswers.jobOffer === 'yes' ? 'Yes' : 'No'}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-medium text-gray-600">Considered a specialty occupation:</span>
+                    <span class="font-bold ${userAnswers.specialty !== 'no' ? 'text-green-600' : 'text-red-600'}">${userAnswers.specialty !== 'no' ? 'Yes' : 'No'}</span>
+                </div>
+                ${userAnswers.jobTitle ? `<div class="flex justify-between items-center pl-4"><span class="text-sm text-gray-500">Job Title:</span><span class="text-sm font-semibold">${userAnswers.jobTitle}</span></div>` : ''}
+                <div class="flex justify-between items-center">
+                    <span class="font-medium text-gray-600">Degree qualification or equivalency:</span>
+                    <span class="font-bold text-green-600">Yes</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-medium text-gray-600">Professional license requirement met:</span>
+                    <span class="font-bold text-green-600">${userAnswers.license === 'yes' ? 'Yes (Assumed)' : 'N/A'}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-medium text-gray-600">Wage meets requirement (mock check):</span>
+                    <span class="font-bold ${userAnswers.wageCompliant ? 'text-green-600' : 'text-yellow-600'}">${userAnswers.wageCompliant ? 'Yes' : 'May Not Meet'}</span>
+                </div>
+                 <div class="flex justify-between items-center">
+                    <span class="font-medium text-gray-600">Maintained lawful status:</span>
+                    <span class="font-bold ${userAnswers.maintainedStatus !== 'no' ? 'text-green-600' : 'text-red-600'}">${userAnswers.maintainedStatus !== 'no' ? 'Yes / N/A' : 'No'}</span>
+                </div>
+            `;
+            
+            const outcome = document.getElementById('outcome');
+            const nextSteps = document.getElementById('nextSteps');
+            const isEligible = userAnswers.jobOffer === 'yes' && userAnswers.specialty !== 'no' && userAnswers.maintainedStatus !== 'no';
+            
+            if (isEligible) {
+                outcome.innerHTML = `<h3 class="text-2xl font-bold text-green-700">Based on your answers, you appear to be a strong candidate for H-1B status.</h3>`;
+                outcome.className = 'mt-6 text-center p-5 rounded-lg bg-green-50 border border-green-200';
+                nextSteps.innerHTML = `
+                    <h4 class="font-semibold text-indigo-800">Next Steps for Eligible Candidates:</h4>
+                    <ul class="list-disc list-inside mt-2 text-sm text-indigo-700 space-y-1">
+                        <li>Coordinate with your employer to prepare for the H-1B registration/lottery process if subject to the cap.</li>
+                        <li>Your employer must file a Labor Condition Application (LCA) with the U.S. Department of Labor.</li>
+                        <li>After LCA certification, your employer files Form I-129, Petition for a Nonimmigrant Worker, with USCIS.</li>
+                        <li>Ensure all USCIS deadlines are met. It is highly recommended to work with an experienced immigration attorney.</li>
+                    </ul>
+                `;
+            } else {
+                outcome.innerHTML = `<h3 class="text-2xl font-bold text-red-700">Based on your answers, you may not qualify for H-1B status at this time.</h3>`;
+                outcome.className = 'mt-6 text-center p-5 rounded-lg bg-red-50 border border-red-200';
+                 nextSteps.innerHTML = `
+                    <h4 class="font-semibold text-red-800">Potential Issues & Alternative Options:</h4>
+                    <p class="text-sm text-red-700 mt-2">Your profile indicates one or more critical eligibility requirements may not be met. Common issues include not having a sponsoring employer, the job not qualifying as a specialty occupation, or a failure to maintain status.</p>
+                    <p class="text-sm text-red-700 mt-2">Consider exploring other options such as: OPT/STEM OPT extensions if you are an F-1 student, other work visa categories (L-1, O-1), or discussing long-term residency options (EB-1, NIW) with an immigration attorney.</p>
+                `;
+            }
+        }
+
+        function restart() {
+            currentStep = 1;
+            Object.keys(userAnswers).forEach(key => delete userAnswers[key]);
+            document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
+            document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => input.value = '');
+            document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+            document.getElementById('ineligibleStatus').classList.remove('active');
+            document.getElementById('ineligibleOffer').classList.remove('active');
+            document.getElementById('ineligibleSpecialty').classList.remove('active');
+            document.getElementById('step1').classList.add('active');
+        }
+        
+        // File input name display
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function() {
+                const fileName = this.files[0] ? this.files[0].name : 'No file selected';
+                const pElement = this.parentElement.querySelector('p');
+                if (pElement) {
+                    pElement.textContent = fileName;
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
