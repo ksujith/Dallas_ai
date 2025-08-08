@@ -1,0 +1,13 @@
+# FastHTML UI Requirements for BoundLy H-1B Assistant
+
+# Core FastHTML framework
+python-fasthtml>=0.2.4
+
+# HTTP client for API calls
+httpx>=0.25.0
+
+# Web server
+uvicorn[standard]>=0.24.0
+
+# Optional: For development
+watchdog>=3.0.0  # For auto-reload during development
